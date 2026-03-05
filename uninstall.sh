@@ -3,7 +3,7 @@ set -uo pipefail
 
 # ============================================================================
 # mac-bootstrap / uninstall.sh
-# 停止并移除所有 LaunchAgent 服务
+# Stop and remove all LaunchAgent services
 # ============================================================================
 
 RED='\033[0;31m'
@@ -18,6 +18,7 @@ warn()  { echo -e "${YELLOW}[WARN]${NC} $*"; }
 
 LAUNCH_AGENTS_DIR="$HOME/Library/LaunchAgents"
 
+# Reverse startup order
 SERVICES=(
     "com.eddie.centurion"
     "com.eddie.telegram-claude-hero"
@@ -27,49 +28,49 @@ SERVICES=(
 
 echo ""
 echo "========================================================================"
-echo "  ⚠️  卸载服务"
+echo "  ⚠️  Uninstall Services"
 echo "========================================================================"
 echo ""
-echo "  将停止并移除以下 LaunchAgent 服务："
+echo "  This will stop and remove the following LaunchAgent services:"
 for svc in "${SERVICES[@]}"; do
     echo "    - $svc"
 done
 echo ""
-echo "  注意：不会删除 ~/Projects/ 下的项目代码和数据。"
+echo "  Note: project code in ~/Projects/ will NOT be deleted."
 echo ""
 echo "========================================================================"
 echo ""
-read -rp "输入 yes 继续，其他任何输入将退出: " confirm
+read -rp "Type 'yes' to continue, anything else to exit: " confirm
 if [[ "$confirm" != "yes" ]]; then
-    echo "已取消。"
+    echo "Cancelled."
     exit 0
 fi
 echo ""
 
-# 按反向启动顺序停止服务
+# Stop services in reverse startup order
 for label in "${SERVICES[@]}"; do
     plist="$LAUNCH_AGENTS_DIR/${label}.plist"
 
     if launchctl list "$label" &>/dev/null 2>&1; then
-        info "停止服务: $label"
+        info "Stopping service: $label"
         launchctl unload "$plist" 2>/dev/null || true
-        ok "已停止: $label"
+        ok "Stopped: $label"
     else
-        info "$label 未在运行"
+        info "$label is not running"
     fi
 
     if [[ -f "$plist" ]]; then
         rm "$plist"
-        ok "已移除: $plist"
+        ok "Removed: $plist"
     fi
 done
 
 echo ""
 echo "========================================================================"
-echo -e "  ${GREEN}✅ 所有服务已停止并移除${NC}"
+echo -e "  ${GREEN}✅ All services stopped and removed${NC}"
 echo ""
-echo "  项目代码保留在 ~/Projects/ 下"
-echo "  如需完全清理，手动执行："
+echo "  Project code is preserved in ~/Projects/"
+echo "  To fully clean up, manually run:"
 echo "    rm -rf ~/Projects/mini-claude-bot"
 echo "    rm -rf ~/Projects/telegram-claude-hero"
 echo "    rm -rf ~/Projects/centurion"

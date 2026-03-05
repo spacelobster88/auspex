@@ -3,7 +3,7 @@ set -euo pipefail
 
 # ============================================================================
 # mac-bootstrap / setup.sh
-# Phase 2: 克隆项目 + 构建 + 配置 Secrets + 安装 LaunchAgent + 启动服务
+# Phase 2: Clone projects + build + configure secrets + install LaunchAgents
 # ============================================================================
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -14,14 +14,14 @@ LAUNCH_AGENTS_DIR="$HOME_DIR/Library/LaunchAgents"
 # GitHub org/user
 GH_OWNER="spacelobster88"
 
-# 服务列表
+# Service list
 SERVICES=(
     "mini-claude-bot"
     "telegram-claude-hero"
     "centurion"
 )
 
-# ---------- 颜色 ----------
+# ---------- Colors ----------
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -35,140 +35,141 @@ warn()  { echo -e "${YELLOW}[WARN]${NC} $*"; }
 err()   { echo -e "${RED}[ERROR]${NC} $*"; }
 step()  { echo -e "\n${CYAN}━━━ $* ━━━${NC}"; }
 
-# ---------- 免责声明 ----------
+# ---------- Disclaimer ----------
 echo ""
 echo "========================================================================"
-echo "  ⚠️  免责声明 / DISCLAIMER"
+echo "  ⚠️  DISCLAIMER"
 echo "========================================================================"
 echo ""
-echo "  本脚本会执行以下操作："
-echo "    - 从 GitHub 克隆项目到 ~/Projects/"
-echo "    - 创建 Python venv 并安装依赖"
-echo "    - 编译 Go 项目"
-echo "    - 写入配置文件到 HOME 目录"
-echo "    - 安装 LaunchAgent 并启动系统服务"
+echo "  This script will:"
+echo "    - Clone projects from GitHub into ~/Projects/"
+echo "    - Create Python venvs and install dependencies"
+echo "    - Compile Go projects"
+echo "    - Write configuration files to your HOME directory"
+echo "    - Install LaunchAgents and start system services"
 echo ""
-echo "  使用本脚本造成的任何系统损坏、数据丢失、服务中断等问题，"
-echo "  由用户自行承担全部责任，与开发者无关。"
+echo "  Any system damage, data loss, or service disruption caused by"
+echo "  this script is entirely the user's responsibility."
+echo "  The developer assumes no liability whatsoever."
 echo ""
 echo "========================================================================"
 echo ""
-read -rp "输入 yes 继续，其他任何输入将退出: " confirm
+read -rp "Type 'yes' to continue, anything else to exit: " confirm
 if [[ "$confirm" != "yes" ]]; then
-    echo "已取消。"
+    echo "Cancelled."
     exit 0
 fi
 echo ""
 
-# ---------- 前置检查 ----------
-step "前置检查"
+# ---------- Prerequisites ----------
+step "Prerequisites"
 
 # GitHub CLI
 if ! command -v gh &>/dev/null; then
-    err "gh (GitHub CLI) 未安装，请先运行 ./install.sh"
+    err "gh (GitHub CLI) not installed — run ./install.sh first"
     exit 1
 fi
 if ! gh auth status &>/dev/null 2>&1; then
-    err "GitHub 未登录，请先运行: gh auth login"
+    err "GitHub not logged in — run: gh auth login"
     exit 1
 fi
-ok "GitHub CLI 已登录"
+ok "GitHub CLI authenticated"
 
 # Claude CLI
 if ! command -v claude &>/dev/null; then
-    warn "Claude CLI 未安装，centurion 和 mini-claude-bot 的部分功能需要它"
-    warn "请稍后运行: npm install -g @anthropic-ai/claude-code && claude login"
+    warn "Claude CLI not installed — some features of centurion and mini-claude-bot require it"
+    warn "Install later with: npm install -g @anthropic-ai/claude-code && claude login"
 else
     ok "Claude CLI: $(claude --version 2>&1 || echo 'installed')"
 fi
 
 # Ollama
 if curl -sf http://localhost:11434/api/tags &>/dev/null; then
-    ok "Ollama 服务正在运行"
+    ok "Ollama service running"
 else
-    warn "Ollama 未运行，尝试启动..."
+    warn "Ollama not running, attempting to start..."
     if command -v brew &>/dev/null; then
         brew services start ollama 2>/dev/null || true
         sleep 3
         if curl -sf http://localhost:11434/api/tags &>/dev/null; then
-            ok "Ollama 已启动"
+            ok "Ollama started"
         else
-            warn "Ollama 启动失败，mini-claude-bot 的嵌入功能将不可用"
+            warn "Ollama failed to start — mini-claude-bot embeddings will be unavailable"
         fi
     fi
 fi
 
-# 创建 Projects 目录
+# Create Projects directory
 mkdir -p "$PROJECTS_DIR"
 
-# ---------- 克隆项目 ----------
-step "克隆项目"
+# ---------- Clone projects ----------
+step "Cloning projects"
 
 for repo in "${SERVICES[@]}"; do
     repo_dir="$PROJECTS_DIR/$repo"
     if [[ -d "$repo_dir/.git" ]]; then
-        info "$repo 已存在，拉取最新代码..."
-        (cd "$repo_dir" && git pull --ff-only 2>/dev/null || warn "$repo git pull 失败，可能有本地修改")
+        info "$repo already exists, pulling latest..."
+        (cd "$repo_dir" && git pull --ff-only 2>/dev/null || warn "$repo git pull failed — may have local changes")
     else
-        info "克隆 $GH_OWNER/$repo..."
+        info "Cloning $GH_OWNER/$repo..."
         gh repo clone "$GH_OWNER/$repo" "$repo_dir"
     fi
     ok "$repo ✓"
 done
 
-# ---------- 构建项目 ----------
-step "构建 mini-claude-bot"
+# ---------- Build projects ----------
+step "Building mini-claude-bot"
 
 MCB_DIR="$PROJECTS_DIR/mini-claude-bot"
 cd "$MCB_DIR"
 
 if [[ ! -d .venv ]]; then
-    info "创建 Python venv..."
+    info "Creating Python venv..."
     python3.13 -m venv .venv 2>/dev/null || python3 -m venv .venv
 fi
-info "安装依赖..."
+info "Installing dependencies..."
 .venv/bin/pip install -q -r backend/requirements.txt
-ok "mini-claude-bot 构建完成"
+ok "mini-claude-bot build complete"
 
-# .env 配置
+# .env config
 if [[ ! -f .env ]]; then
     cp "$SCRIPT_DIR/env/mini-claude-bot.env.example" .env
-    info "已创建 .env 模板，稍后配置"
+    info "Created .env template — will configure shortly"
 fi
 
-step "构建 telegram-claude-hero"
+step "Building telegram-claude-hero"
 
 TCH_DIR="$PROJECTS_DIR/telegram-claude-hero"
 cd "$TCH_DIR"
 
-info "编译 Go 项目..."
+info "Compiling Go project..."
 go build -o telegram-claude-hero .
-ok "telegram-claude-hero 构建完成"
+ok "telegram-claude-hero build complete"
 
-step "构建 centurion"
+step "Building centurion"
 
 CENT_DIR="$PROJECTS_DIR/centurion"
 cd "$CENT_DIR"
 
 if [[ ! -d .venv ]]; then
-    info "创建 Python venv..."
+    info "Creating Python venv..."
     python3.13 -m venv .venv 2>/dev/null || python3 -m venv .venv
 fi
-info "安装依赖..."
+info "Installing dependencies..."
 .venv/bin/pip install -q -e ".[dev]"
-ok "centurion 构建完成"
+ok "centurion build complete"
 
-# ---------- Secrets 配置 ----------
-step "配置 Secrets"
+# ---------- Secrets configuration ----------
+step "Configuring secrets"
 
 # Telegram Bot Token
 TCH_CONFIG="$HOME_DIR/.telegram-claude-hero.json"
 if [[ -f "$TCH_CONFIG" ]]; then
-    ok "Telegram 配置已存在: $TCH_CONFIG"
+    ok "Telegram config already exists: $TCH_CONFIG"
 else
     echo ""
-    echo "需要 Telegram Bot Token（从 @BotFather 获取）"
-    read -rp "输入 Telegram Bot Token (留空跳过): " tg_token
+    echo "Telegram Bot Token is required (get it from @BotFather)"
+    read -rp "Enter Telegram Bot Token (leave empty to skip): " tg_token
     if [[ -n "$tg_token" ]]; then
         cat > "$TCH_CONFIG" <<EOF
 {
@@ -177,9 +178,9 @@ else
 }
 EOF
         chmod 600 "$TCH_CONFIG"
-        ok "Telegram 配置已写入: $TCH_CONFIG"
+        ok "Telegram config written: $TCH_CONFIG"
     else
-        warn "跳过 Telegram 配置，telegram-claude-hero 将无法启动"
+        warn "Skipped Telegram config — telegram-claude-hero will not be able to start"
     fi
 fi
 
@@ -187,27 +188,27 @@ fi
 MCB_ENV="$MCB_DIR/.env"
 if grep -q "METRICS_SECRET=$" "$MCB_ENV" 2>/dev/null; then
     echo ""
-    echo "可选：配置 Dashboard Metrics Secret（用于推送监控数据到 Vercel）"
-    read -rp "输入 METRICS_SECRET (留空跳过): " metrics_secret
+    echo "Optional: Dashboard Metrics Secret (for pushing metrics to Vercel)"
+    read -rp "Enter METRICS_SECRET (leave empty to skip): " metrics_secret
     if [[ -n "$metrics_secret" ]]; then
         sed -i '' "s|METRICS_SECRET=|METRICS_SECRET=$metrics_secret|" "$MCB_ENV"
-        ok "METRICS_SECRET 已配置"
+        ok "METRICS_SECRET configured"
     else
-        info "跳过 METRICS_SECRET"
+        info "Skipped METRICS_SECRET"
     fi
 fi
 
-# Claude 登录提示
+# Claude login reminder
 if command -v claude &>/dev/null; then
     if ! claude --version &>/dev/null 2>&1; then
         echo ""
-        warn "Claude CLI 尚未登录"
-        echo "请在脚本结束后运行: claude login"
+        warn "Claude CLI is not logged in"
+        echo "Run after this script finishes: claude login"
     fi
 fi
 
-# ---------- 安装 LaunchAgents ----------
-step "安装 LaunchAgent 服务"
+# ---------- Install LaunchAgents ----------
+step "Installing LaunchAgent services"
 
 mkdir -p "$LAUNCH_AGENTS_DIR"
 
@@ -223,35 +224,35 @@ for label in "${PLIST_TEMPLATES[@]}"; do
     target="$LAUNCH_AGENTS_DIR/${label}.plist"
 
     if [[ ! -f "$template" ]]; then
-        warn "模板不存在: $template"
+        warn "Template not found: $template"
         continue
     fi
 
-    # 如果服务正在运行，先卸载
+    # Unload if already running
     if launchctl list "$label" &>/dev/null 2>&1; then
-        info "卸载已有服务: $label"
+        info "Unloading existing service: $label"
         launchctl unload "$target" 2>/dev/null || true
     fi
 
-    # 替换模板变量
+    # Replace template variables
     sed "s|__HOME__|$HOME_DIR|g" "$template" > "$target"
-    ok "已安装: $target"
+    ok "Installed: $target"
 done
 
-# ---------- 启动服务（按顺序）----------
-step "启动服务"
+# ---------- Start services (in order) ----------
+step "Starting services"
 
-info "启动顺序: Ollama → mini-claude-bot → telegram-claude-hero → centurion"
+info "Start order: Ollama → mini-claude-bot → telegram-claude-hero → centurion"
 echo ""
 
 # 1. Ollama
 OLLAMA_PLIST="$LAUNCH_AGENTS_DIR/com.eddie.ollama.plist"
 if [[ -f "$OLLAMA_PLIST" ]]; then
     launchctl load "$OLLAMA_PLIST" 2>/dev/null || true
-    info "等待 Ollama 启动..."
+    info "Waiting for Ollama to start..."
     for i in $(seq 1 10); do
         if curl -sf http://localhost:11434/api/tags &>/dev/null; then
-            ok "Ollama 已启动 (port 11434)"
+            ok "Ollama started (port 11434)"
             break
         fi
         sleep 1
@@ -262,10 +263,10 @@ fi
 MCB_PLIST="$LAUNCH_AGENTS_DIR/com.eddie.mini-claude-bot.plist"
 if [[ -f "$MCB_PLIST" ]]; then
     launchctl load "$MCB_PLIST" 2>/dev/null || true
-    info "等待 mini-claude-bot 启动..."
+    info "Waiting for mini-claude-bot to start..."
     for i in $(seq 1 10); do
         if curl -sf http://localhost:8000/api/gateway/sessions &>/dev/null; then
-            ok "mini-claude-bot 已启动 (port 8000)"
+            ok "mini-claude-bot started (port 8000)"
             break
         fi
         sleep 1
@@ -278,9 +279,9 @@ if [[ -f "$TCH_PLIST" ]]; then
     launchctl load "$TCH_PLIST" 2>/dev/null || true
     sleep 2
     if pgrep -f "telegram-claude-hero" &>/dev/null; then
-        ok "telegram-claude-hero 已启动"
+        ok "telegram-claude-hero started"
     else
-        warn "telegram-claude-hero 可能未正常启动，检查日志: /tmp/telegram-claude-hero.log"
+        warn "telegram-claude-hero may not have started — check log: /tmp/telegram-claude-hero.log"
     fi
 fi
 
@@ -288,45 +289,43 @@ fi
 CENT_PLIST="$LAUNCH_AGENTS_DIR/com.eddie.centurion.plist"
 if [[ -f "$CENT_PLIST" ]]; then
     launchctl load "$CENT_PLIST" 2>/dev/null || true
-    info "等待 centurion 启动..."
+    info "Waiting for centurion to start..."
     for i in $(seq 1 10); do
         if curl -sf http://localhost:8100/status &>/dev/null; then
-            ok "centurion 已启动 (port 8100)"
+            ok "centurion started (port 8100)"
             break
         fi
         sleep 1
     done
 fi
 
-# ---------- Claude MCP 配置 ----------
-step "配置 Claude MCP Server"
+# ---------- Claude MCP configuration ----------
+step "Configuring Claude MCP Server"
 
-CLAUDE_SETTINGS="$HOME_DIR/.claude/settings.json"
 if command -v claude &>/dev/null; then
-    # 使用 claude mcp add 注册 centurion
     claude mcp add centurion \
         "$CENT_DIR/.venv/bin/python" \
         -e CENTURION_API_BASE=http://localhost:8100/api/centurion \
-        -- -m centurion.mcp.tools 2>/dev/null && ok "Centurion MCP server 已注册" || warn "MCP 注册失败，可手动配置"
+        -- -m centurion.mcp.tools 2>/dev/null && ok "Centurion MCP server registered" || warn "MCP registration failed — configure manually if needed"
 else
-    warn "Claude CLI 未安装，跳过 MCP 配置"
+    warn "Claude CLI not installed — skipping MCP configuration"
 fi
 
-# ---------- 完成 ----------
+# ---------- Done ----------
 echo ""
 echo "========================================================================"
-echo -e "  ${GREEN}✅ Phase 2 完成：项目已部署并启动${NC}"
+echo -e "  ${GREEN}✅ Phase 2 complete: projects deployed and services started${NC}"
 echo ""
-echo "  运行健康检查:  ./health-check.sh"
+echo "  Run health check:  ./health-check.sh"
 echo ""
-echo "  服务日志:"
-echo "    Ollama:              /opt/homebrew/var/log/ollama.log"
-echo "    mini-claude-bot:     /tmp/mini-claude-bot.log"
+echo "  Service logs:"
+echo "    Ollama:               /opt/homebrew/var/log/ollama.log"
+echo "    mini-claude-bot:      /tmp/mini-claude-bot.log"
 echo "    telegram-claude-hero: /tmp/telegram-claude-hero.log"
-echo "    centurion:           /tmp/centurion.log"
+echo "    centurion:            /tmp/centurion.log"
 echo ""
-echo "  手动步骤（如果尚未完成）:"
-echo "    - claude login       # Claude CLI 登录"
-echo "    - 系统设置 → 隐私 → 给 Terminal 授权 Accessibility/Full Disk Access/Automation"
+echo "  Manual steps (if not done yet):"
+echo "    - claude login       # Claude CLI login"
+echo "    - System Settings → Privacy → grant Terminal Accessibility/Full Disk Access/Automation"
 echo "========================================================================"
 echo ""

@@ -3,7 +3,7 @@ set -uo pipefail
 
 # ============================================================================
 # mac-bootstrap / health-check.sh
-# Phase 3: 验证所有服务健康状态
+# Phase 3: Verify all services are healthy
 # ============================================================================
 
 RED='\033[0;31m'
@@ -22,51 +22,51 @@ skip() { echo -e "  ${YELLOW}⚠️${NC}  $*"; ((WARN_COUNT++)); }
 
 echo ""
 echo "========================================================================"
-echo "  🏥 服务健康检查"
+echo "  🏥 Service Health Check"
 echo "========================================================================"
 echo ""
 
-# ---------- 系统信息 ----------
-echo -e "${BLUE}[系统]${NC}"
-echo "  主机: $(hostname)"
+# ---------- System info ----------
+echo -e "${BLUE}[System]${NC}"
+echo "  Host: $(hostname)"
 echo "  macOS: $(sw_vers -productVersion)"
-echo "  芯片: $(uname -m)"
+echo "  Chip: $(uname -m)"
 
 TOTAL_MEM_GB="$(sysctl -n hw.memsize | awk '{printf "%.0f", $1/1073741824}')"
 PHYS_MEM="$(top -l 1 -s 0 2>/dev/null | grep PhysMem || echo 'N/A')"
-echo "  内存: ${TOTAL_MEM_GB}GB — $PHYS_MEM"
+echo "  RAM: ${TOTAL_MEM_GB}GB — $PHYS_MEM"
 
 AVAIL_DISK_GB="$(df -g / | tail -1 | awk '{print $4}')"
-echo "  磁盘可用: ${AVAIL_DISK_GB}GB"
+echo "  Disk available: ${AVAIL_DISK_GB}GB"
 echo ""
 
 # ---------- Ollama ----------
 echo -e "${BLUE}[Ollama]${NC} (port 11434)"
 if curl -sf http://localhost:11434/api/tags &>/dev/null; then
-    pass "Ollama 服务运行中"
+    pass "Ollama service running"
     if curl -sf http://localhost:11434/api/tags | grep -q "nomic-embed-text"; then
-        pass "nomic-embed-text 模型可用"
+        pass "nomic-embed-text model available"
     else
-        fail "nomic-embed-text 模型未找到"
+        fail "nomic-embed-text model not found"
     fi
 else
-    fail "Ollama 服务未响应"
+    fail "Ollama service not responding"
 fi
 echo ""
 
 # ---------- mini-claude-bot ----------
 echo -e "${BLUE}[mini-claude-bot]${NC} (port 8000)"
 if curl -sf http://localhost:8000/api/gateway/sessions &>/dev/null; then
-    pass "mini-claude-bot 服务运行中"
+    pass "mini-claude-bot service running"
 else
-    fail "mini-claude-bot 服务未响应"
+    fail "mini-claude-bot service not responding"
 fi
 
 if pgrep -f "uvicorn.*backend.main" &>/dev/null; then
     PID=$(pgrep -f "uvicorn.*backend.main" | head -1)
-    pass "进程运行中 (PID: $PID)"
+    pass "Process running (PID: $PID)"
 else
-    fail "uvicorn 进程未找到"
+    fail "uvicorn process not found"
 fi
 echo ""
 
@@ -74,27 +74,27 @@ echo ""
 echo -e "${BLUE}[telegram-claude-hero]${NC}"
 if pgrep -f "telegram-claude-hero" &>/dev/null; then
     PID=$(pgrep -f "telegram-claude-hero" | head -1)
-    pass "进程运行中 (PID: $PID)"
+    pass "Process running (PID: $PID)"
 else
-    fail "telegram-claude-hero 进程未找到"
+    fail "telegram-claude-hero process not found"
 fi
 
 if [[ -f "$HOME/.telegram-claude-hero.json" ]]; then
-    pass "Telegram 配置文件存在"
+    pass "Telegram config file exists"
 else
-    fail "缺少配置文件: ~/.telegram-claude-hero.json"
+    fail "Missing config file: ~/.telegram-claude-hero.json"
 fi
 echo ""
 
 # ---------- centurion ----------
 echo -e "${BLUE}[centurion]${NC} (port 8100)"
 if curl -sf http://localhost:8100/status &>/dev/null; then
-    pass "centurion 服务运行中"
+    pass "centurion service running"
 else
     if pgrep -f "centurion" &>/dev/null; then
-        skip "centurion 进程存在但 HTTP 未响应"
+        skip "centurion process exists but HTTP not responding"
     else
-        fail "centurion 服务未运行"
+        fail "centurion service not running"
     fi
 fi
 echo ""
@@ -104,7 +104,7 @@ echo -e "${BLUE}[Claude CLI]${NC}"
 if command -v claude &>/dev/null; then
     pass "Claude CLI: $(claude --version 2>&1 || echo 'installed')"
 else
-    fail "Claude CLI 未安装"
+    fail "Claude CLI not installed"
 fi
 echo ""
 
@@ -114,25 +114,25 @@ for label in com.eddie.ollama com.eddie.mini-claude-bot com.eddie.telegram-claud
     plist="$HOME/Library/LaunchAgents/${label}.plist"
     if [[ -f "$plist" ]]; then
         if launchctl list "$label" &>/dev/null 2>&1; then
-            pass "$label — 已加载"
+            pass "$label — loaded"
         else
-            skip "$label — plist 存在但未加载"
+            skip "$label — plist exists but not loaded"
         fi
     else
-        fail "$label — plist 不存在"
+        fail "$label — plist not found"
     fi
 done
 echo ""
 
-# ---------- 汇总 ----------
+# ---------- Summary ----------
 echo "========================================================================"
-echo -e "  结果: ${GREEN}${PASS} 通过${NC}  ${RED}${FAIL} 失败${NC}  ${YELLOW}${WARN_COUNT} 警告${NC}"
+echo -e "  Results: ${GREEN}${PASS} passed${NC}  ${RED}${FAIL} failed${NC}  ${YELLOW}${WARN_COUNT} warnings${NC}"
 if [[ $FAIL -eq 0 ]]; then
-    echo -e "  ${GREEN}🎉 所有服务正常！${NC}"
+    echo -e "  ${GREEN}🎉 All services healthy!${NC}"
 else
-    echo -e "  ${YELLOW}请检查上述失败项${NC}"
+    echo -e "  ${YELLOW}Please check the failed items above${NC}"
     echo ""
-    echo "  查看日志:"
+    echo "  View logs:"
     echo "    tail -50 /opt/homebrew/var/log/ollama.log"
     echo "    tail -50 /tmp/mini-claude-bot.log"
     echo "    tail -50 /tmp/telegram-claude-hero.log"
