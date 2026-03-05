@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.eddie.mini-claude-bot</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>__HOME__/Projects/mini-claude-bot/.venv/bin/uvicorn</string>
+        <string>backend.main:app</string>
+        <string>--host</string>
+        <string>0.0.0.0</string>
+        <string>--port</string>
+        <string>8000</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>__HOME__/Projects/mini-claude-bot</string>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/mini-claude-bot.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/tmp/mini-claude-bot.log</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>__HOME__/.local/bin:__HOME__/Projects/mini-claude-bot/.venv/bin:/opt/homebrew/bin:/usr/local/bin:/Library/TeX/texbin:/usr/sbin:/usr/bin:/bin</string>
+        <key>GATEWAY_CLAUDE_TIMEOUT</key>
+        <string>86400</string>
+    </dict>
+</dict>
+</plist>

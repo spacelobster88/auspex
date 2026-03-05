@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.eddie.telegram-claude-hero</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>__HOME__/Projects/telegram-claude-hero/telegram-claude-hero</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>__HOME__/Projects/telegram-claude-hero</string>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/telegram-claude-hero.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/tmp/telegram-claude-hero.log</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>GATEWAY_URL</key>
+        <string>http://localhost:8000</string>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+    </dict>
+</dict>
+</plist>

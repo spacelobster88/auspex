@@ -1,0 +1,6 @@
+brew "python@3.13"
+brew "go"
+brew "node"
+brew "ollama"
+brew "gh"
+brew "tectonic"
