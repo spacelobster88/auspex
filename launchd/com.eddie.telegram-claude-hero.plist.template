@@ -28,7 +28,7 @@
     <key>EnvironmentVariables</key>
     <dict>
         <key>GATEWAY_URL</key>
-        <string>http://localhost:8000</string>
+        <string>http://127.0.0.1:8000</string>
         <key>PATH</key>
         <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
     </dict>
