@@ -1,53 +1,53 @@
 {
-  "stack_version": "1.1.0",
-  "released": "2026-03-18",
+  "stack_version": "1.1.1-auto-restart",
+  "released": "2026-03-19",
   "description": "Pinned versions of all microservices in the Auspex stack. setup.sh reads this file to checkout exact commits, ensuring reproducible deployments.",
   "services": {
     "mini-claude-bot": {
       "repo": "spacelobster88/mini-claude-bot",
-      "ref": "29f645063b3203c6cec9fbba39cac4cdc02860df",
+      "ref": "218996fb8618c807bdb28a0034d14fd2dd0eabc1",
       "ref_type": "tag",
-      "version": "1.1.0",
+      "version": "1.1.1-auto-restart",
       "dependencies": [
         "ollama"
       ],
-      "tag": "v1.1.0"
+      "tag": "v1.1.1-auto-restart"
     },
     "telegram-claude-hero": {
       "repo": "spacelobster88/telegram-claude-hero",
       "ref": "e397ffb3fa9183b7d2e8ba2c399972df771b32da",
       "ref_type": "tag",
-      "version": "1.1.0",
+      "version": "1.1.1-auto-restart",
       "dependencies": [
         "mini-claude-bot"
       ],
-      "tag": "v1.1.0"
+      "tag": "v1.1.1-auto-restart"
     },
     "centurion": {
       "repo": "spacelobster88/centurion",
-      "ref": "f944db0e9fda578e49f7649f568a528692ac255d",
+      "ref": "bf96eda4cdd29839db798072a775066203173aba",
       "ref_type": "tag",
-      "version": "1.1.0",
+      "version": "1.1.1-auto-restart",
       "dependencies": [
         "mini-claude-bot"
       ],
-      "tag": "v1.1.0"
+      "tag": "v1.1.1-auto-restart"
     },
     "smart-email-responder": {
       "repo": "spacelobster88/smart-email-responder",
       "ref": "09c74382dec7f549e5f9caf699d312c2c6ca8364",
       "ref_type": "tag",
-      "version": "1.1.0",
+      "version": "1.1.1-auto-restart",
       "dependencies": [],
-      "tag": "v1.1.0"
+      "tag": "v1.1.1-auto-restart"
     },
     "harness-loop": {
       "repo": "spacelobster88/harness-loop",
       "ref": "e81eb241c6f6505a0d30d28adf136d7bd0d7e5a6",
       "ref_type": "tag",
-      "version": "1.1.0",
+      "version": "1.1.1-auto-restart",
       "dependencies": [],
-      "tag": "v1.1.0"
+      "tag": "v1.1.1-auto-restart"
     }
   }
 }

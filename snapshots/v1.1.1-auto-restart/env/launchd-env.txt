@@ -1,0 +1,45 @@
+# com.eddie.mini-claude-bot.plist.template
+Label=com.eddie.mini-claude-bot
+ProgramArguments=__HOME__/Projects/mini-claude-bot/.venv/bin/uvicorn
+WorkingDirectory=backend.main:app
+RunAtLoad=--host
+KeepAlive=0.0.0.0
+StandardOutPath=--port
+StandardErrorPath=8000
+EnvironmentVariables=__HOME__/Projects/mini-claude-bot
+PATH=/tmp/mini-claude-bot.log
+GATEWAY_CLAUDE_TIMEOUT=/tmp/mini-claude-bot.log
+
+# com.eddie.ollama.plist.template
+Label=com.eddie.ollama
+ProgramArguments=/opt/homebrew/opt/ollama/bin/ollama
+WorkingDirectory=serve
+RunAtLoad=/opt/homebrew/var
+KeepAlive=Aqua
+LimitLoadToSessionType=REDACTED
+StandardOutPath=LoginWindow
+StandardErrorPath=StandardIO
+EnvironmentVariables=System
+OLLAMA_FLASH_ATTENTION=/opt/homebrew/var/log/ollama.log
+OLLAMA_KV_CACHE_TYPE=/opt/homebrew/var/log/ollama.log
+
+# com.eddie.centurion.plist.template
+Label=com.eddie.centurion
+ProgramArguments=__HOME__/Projects/centurion/.venv/bin/python
+WorkingDirectory=-m
+RunAtLoad=centurion
+KeepAlive=__HOME__/Projects/centurion
+StandardOutPath=/tmp/centurion.log
+StandardErrorPath=/tmp/centurion.log
+EnvironmentVariables=__HOME__/.local/bin:__HOME__/Projects/centurion/.venv/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin
+PATH=8100
+
+# com.eddie.telegram-claude-hero.plist.template
+Label=com.eddie.telegram-claude-hero
+ProgramArguments=__HOME__/Projects/telegram-claude-hero/telegram-claude-hero
+WorkingDirectory=__HOME__/Projects/telegram-claude-hero
+RunAtLoad=/tmp/telegram-claude-hero.log
+KeepAlive=/tmp/telegram-claude-hero.log
+StandardOutPath=http://127.0.0.1:8000
+StandardErrorPath=/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin
+

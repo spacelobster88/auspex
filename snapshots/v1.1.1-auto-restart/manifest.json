@@ -1,0 +1,9 @@
+{
+  "version": "v1.1.1-auto-restart",
+  "date": "2026-03-19",
+  "services_env_captured": [
+    "mini-claude-bot",
+    "smart-email-responder"
+  ],
+  "note": "Sensitive values (tokens, passwords, PII) are REDACTED. Only tuning/config params have real values."
+}
