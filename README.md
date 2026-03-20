@@ -3,7 +3,7 @@
 **One who reads the signs and prepares the ground. Bootstrap a fresh Mac with your AI agent service stack.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Latest: v1.1.0](https://img.shields.io/badge/Latest-v1.1.0-brightgreen.svg)](https://github.com/spacelobster88/auspex/releases/tag/v1.1.0)
+[![Latest: v1.1.1-auto-restart](https://img.shields.io/badge/Latest-v1.1.1--auto--restart-brightgreen.svg)](https://github.com/spacelobster88/auspex/releases/tag/v1.1.1-auto-restart)
 [![macOS](https://img.shields.io/badge/macOS-14.0%2B-blue.svg)]()
 [![Apple Silicon](https://img.shields.io/badge/Apple%20Silicon-M1%2B-black.svg)]()
 [![Services](https://img.shields.io/badge/Services-6-orange.svg)]()
@@ -220,6 +220,25 @@ scp -r old-mac:~/.claude/ ~/
 ```
 
 ## Release History
+
+### v1.1.1-auto-restart (2026-03-19) — LaunchAgent Auto-Restart
+
+**Centurion**
+- Added `scripts/install-launchd.sh` — one-command install/uninstall of Centurion as a macOS LaunchAgent
+- LaunchAgent configured with `KeepAlive` (auto-restart on crash) and `RunAtLoad` (start on boot)
+- Supports `CENTURION_HOST` / `CENTURION_PORT` env var overrides
+- Templated plist generation (paths derived from project location, not hardcoded)
+
+**Stack**
+| Service | Commit |
+|---------|--------|
+| mini-claude-bot | `29f6450` |
+| telegram-claude-hero | `e397ffb` |
+| centurion | `bf96eda` |
+| smart-email-responder | `09c7438` |
+| harness-loop | `e81eb24` |
+
+---
 
 ### v1.1.0 (2026-03-18) — Reliability & Observability
 

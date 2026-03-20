@@ -28,8 +28,8 @@ warn()  { echo -e "${YELLOW}[snapshot]${NC} $*"; }
 error() { echo -e "${RED}[snapshot]${NC} $*" >&2; }
 
 # Validate version format
-if [[ ! "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-    error "Version must be semver format: v{major}.{minor}.{patch}"
+if [[ ! "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([-][a-zA-Z0-9._-]+)?$ ]]; then
+    error "Version must be semver format: v{major}.{minor}.{patch}[-prerelease]"
     exit 1
 fi
 
