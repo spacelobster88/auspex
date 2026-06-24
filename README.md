@@ -3,7 +3,7 @@
 **Bootstrap a fresh Mac into a fully operational AI agent hub.**
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Latest: v1.1.1-auto-restart](https://img.shields.io/badge/Latest-v1.1.1--auto--restart-brightgreen.svg)](https://github.com/spacelobster88/auspex/releases/tag/v1.1.1-auto-restart)
+[![Latest: v2.0.0](https://img.shields.io/badge/Latest-v2.0.0-brightgreen.svg)](https://github.com/spacelobster88/auspex/releases/tag/v2.0.0)
 [![macOS](https://img.shields.io/badge/macOS-14.0%2B-blue.svg)]()
 [![Apple Silicon](https://img.shields.io/badge/Apple%20Silicon-M1%2B-black.svg)]()
 [![Services](https://img.shields.io/badge/Services-6-orange.svg)]()
@@ -153,6 +153,13 @@ scp -r old-mac:~/.claude/ ~/
 ---
 
 ## Release History
+
+### v2.0.0 (2026-06-24) -- Gateway UX Hardening
+
+- **mini-claude-bot** (v2.0.0): `[BUSY]` replies now name the in-flight message + elapsed time; queue-wait timeout raised 120->300s and documented; harness auto/normal modes with a grill-me interview (suggested answer per question), behind `GATEWAY_HARNESS_AUTO_MODE`; faster context reload after a session is reaped; reliable terminal background-task status.
+- **telegram-claude-hero** (v2.0.0): surface backend error events (`[BUSY]`) instead of swallowing them; persist `pendingExec` to disk so `/confirm` survives a bot restart; format-tolerant `[HARNESS_EXEC_READY]` detection.
+- **harness-loop** (v2.0.0): Grill-Me Protocol documented as the source of truth (suggested answer per clarifying question; auto-mode auto-applies).
+- centurion, smart-email-responder, aros-meta-loop-python unchanged (remain at v1.3.0).
 
 ### v1.1.1-auto-restart (2026-03-19)
 

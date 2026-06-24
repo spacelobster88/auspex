@@ -1,0 +1,6 @@
+{
+  "version": "v2.0.0",
+  "date": "2026-06-24",
+  "services_env_captured": [],
+  "note": "gateway-ux-hardening release. Only mini-claude-bot, telegram-claude-hero, harness-loop changed; others remain at v1.3.0. Env capture skipped (no env changes this release)."
+}

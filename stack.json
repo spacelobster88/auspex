@@ -1,27 +1,27 @@
 {
-  "stack_version": "1.3.0",
-  "released": "2026-03-25",
+  "stack_version": "2.0.0",
+  "released": "2026-06-24",
   "description": "Pinned versions of all microservices in the Auspex stack. setup.sh reads this file to checkout exact commits, ensuring reproducible deployments.",
   "services": {
     "mini-claude-bot": {
       "repo": "spacelobster88/mini-claude-bot",
-      "ref": "997d91aef4b334de64c33672504eb743f6c5de2f",
+      "ref": "40a7b0e5ebb6118e06c096353fb2111ba5f970af",
       "ref_type": "tag",
-      "version": "1.3.0",
+      "version": "2.0.0",
       "dependencies": [
         "ollama"
       ],
-      "tag": "v1.3.0"
+      "tag": "v2.0.0"
     },
     "telegram-claude-hero": {
       "repo": "spacelobster88/telegram-claude-hero",
-      "ref": "ce7d31190f5c6d9e3a4c1932b813494495996135",
+      "ref": "e1e21b867f2b3236813fc0abe385f26f384a080e",
       "ref_type": "tag",
-      "version": "1.3.0",
+      "version": "2.0.0",
       "dependencies": [
         "mini-claude-bot"
       ],
-      "tag": "v1.3.0"
+      "tag": "v2.0.0"
     },
     "centurion": {
       "repo": "spacelobster88/centurion",
@@ -43,11 +43,11 @@
     },
     "harness-loop": {
       "repo": "spacelobster88/harness-loop",
-      "ref": "ea258d5a50dea7b811e103083fcfee33a10c652d",
+      "ref": "a2db455c90206081982cd9cf1e62f77addd856c1",
       "ref_type": "tag",
-      "version": "1.3.0",
+      "version": "2.0.0",
       "dependencies": [],
-      "tag": "v1.3.0"
+      "tag": "v2.0.0"
     },
     "aros-meta-loop-python": {
       "repo": "AROS-Lab/aros-meta-loop-python",
